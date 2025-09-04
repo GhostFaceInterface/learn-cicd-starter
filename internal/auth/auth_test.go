@@ -42,13 +42,13 @@ func TestGetAPIKey(t *testing.T) {
 			errMessage: "malformed authorization header",
 		},
 		{
-			name:    "valid ApiKey <token>",
+name:    "valid ApiKey <token>",
 			header:  makeHeader("ApiKey secret-123"),
-			wantKey: "secret-123",
+wantKey: "secret-123",
 		},
 		{
 			name:       "extra parts -> halen ikinci parça alınır",
-			header:     makeHeader("ApiKey part1 part2"),
+header:     makeHeader("ApiKey part1 part2"),
 			// mevcut implementasyon strings.Split kullanıyor, bu yüzden ikinci parça döner
 			// (beklenen davranış buysa anahtar "part1" olur; daha katı istenirse fonksiyon güncellenmeli)
 			wantKey: "part1",
