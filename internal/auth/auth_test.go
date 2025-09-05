@@ -47,8 +47,8 @@ func TestGetAPIKey(t *testing.T) {
 			wantKey: "secret-123",
 		},
 		{
-			name:       "extra parts -> halen ikinci parça alınır",
-			header:     makeHeader("ApiKey part1 part2"),
+			name:   "extra parts -> halen ikinci parça alınır",
+			header: makeHeader("ApiKey part1 part2"),
 			// mevcut implementasyon strings.Split kullanıyor, bu yüzden ikinci parça döner
 			// (beklenen davranış buysa anahtar "part1" olur; daha katı istenirse fonksiyon güncellenmeli)
 			wantKey: "part1",
