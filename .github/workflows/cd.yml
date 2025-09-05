@@ -1,20 +1,41 @@
 name: cd
-on:
-    push:
-        branches: [main]
-    
-jobs:
-    Deploy:
-        runs-on: ubuntu-latest
-        name: Deploy
-        steps:
-            - name: Check out code
-              uses: actions/checkout@v4
 
-            - name: Set up Go
-              uses: actions/setup-go@v5
-              with:
-                go-version: "1.23.0"
-                
-            - name: Build
-              run: ./scripts/buildprod.sh
+on:
+  push:
+    branches: [main]
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.0"
+
+      - name: Build app
+        run: ./scripts/buildprod.sh
+
+      # ---- GCP auth (JSON key) ----
+      - id: auth
+        name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: concise-slate-471213-c1
+          install_components: 'gke-gcloud-auth-plugin' # zararsız; yoksa da olur
+
+      # ---- Build & push Docker image to Artifact Registry ----
+      - name: Build & Push image (Cloud Build)
+        run: |
+          IMAGE="us-central1-docker.pkg.dev/concise-slate-471213-c1/notely-ar-repo/notely:${{ github.sha }}"
+          echo "IMAGE=${IMAGE}"
+          gcloud builds submit --tag "${IMAGE}" .
