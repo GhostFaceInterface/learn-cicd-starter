@@ -38,7 +38,8 @@ jobs:
         run: |
           IMAGE="us-central1-docker.pkg.dev/concise-slate-471213-c1/notely-ar-repo/notely:${{ github.sha }}"
           echo "IMAGE=${IMAGE}"
+          echo "IMAGE=${IMAGE}" >> $GITHUB_ENV
           gcloud builds submit --tag "${IMAGE}" .
 
       - name: Deploy to Cloud Run
-        run: gcloud run deploy notely --image us-central1-docker.pkg.dev/concise-slate-471213-c1/notely-ar-repo/notely:latest --region us-central1 --allow-unauthenticated --project concise-slate-471213-c1 --max-instances=4
+        run: gcloud run deploy notely --image ${IMAGE} --region us-central1 --allow-unauthenticated --project concise-slate-471213-c1 --max-instances=4
