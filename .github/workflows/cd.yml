@@ -7,6 +7,8 @@ on:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - name: Check out code
@@ -16,6 +18,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.23.0"
+      - name: Install goose
+        run: go install github.com/pressly/goose/v3/cmd/goose@latest
 
       - name: Build app
         run: ./scripts/buildprod.sh
@@ -40,6 +44,9 @@ jobs:
           echo "IMAGE=${IMAGE}"
           echo "IMAGE=${IMAGE}" >> $GITHUB_ENV
           gcloud builds submit --tag "${IMAGE}" .
+          
+      - name: Deploy to cloud Run
+        run: ./scripts/migrateup.sh
 
       - name: Deploy to Cloud Run
         run: gcloud run deploy notely --image ${IMAGE} --region us-central1 --allow-unauthenticated --project concise-slate-471213-c1 --max-instances=4
